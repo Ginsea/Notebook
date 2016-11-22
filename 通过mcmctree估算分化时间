@@ -1,0 +1,110 @@
+本备忘通过Dr. Yang的说明书（http://abacus.gene.ucl.ac.uk/software/MCMCtree.Tutorials.pdf）进行学习，并记录学习结果。
+#1. 物种树的准备，具体如下：
+=================================树文件(mtCDNApri.trees)========================================================================
+7 1
+((((human, (chimpanzee, bonobo)) '>.06<.08', gorilla),
+(orangutan, sumatran)) '>.12<.16', gibbon);
+==================================end=========================================================================
+#第一列：7表示物种数目；1表示树文件的数目。
+#树文件格式为newick
+#'>.06<.08'表示化石时间，单位为百万年，100Myr，所以该化石矫正点表示human和chimp的共同祖先出现于6Myr-8Myr之间。
+#树根部也需要化石时间，若根部无法查找到化石时间，则需要配置文件中设定RootAge参数，具体见配置文件的设定。
+
+#2. 准备序列文件，具体如下：
+==============================================序列文件（mtCDNApri123.txt）=========================================================
+     7    3331
+human               AGACTGTTAGCAGCGCCGGGCAACTCCCTACTCAAACCAAACCTCAAGCATTCACGTTAATAGAAACCGCCCCTTACAACCTAACGAGACTTGGGGACGCTTCCGACACCACACGAAGAAA
+chimpanzee          AGACTGTTGGCAACGTCGGGCAACTCCCCGCCCAAACCAAACCTCACGCATTCACGTTAATAAAAACCGCCCCTTACAACCTAACGAGACCTGGGGGCGCTTCCGACACCACACGAAGAA
+bonobo              AGACTGTTGGCAACGCCGGGCAACTCCCCGCCCAAACCAAACCTCACGCATTCACGTTAATAGAAACCGCCCCTTACAACCTAACGAGACCTGGAGGCGCTTCCGACACCACACAAAGAA
+gorilla             AGATTGTTAGCAACGTCGGGTAACCCCCCACTCAAACCAGACCTCACGCATTCATATTAATAGAAACCGCTCCTTACAACCTAACGAGACCTGGGGACGCCCCCGACACCACACGAAGAA
+orangutan           AGGCTACTAACAGCGCCGGACGATTCCTCGCCTAAACCAAACCTCACGCATTCACATCAATAGTAACCGCTCTTTACAACCTAATGAGACCTGAAGGCGCCTCCGACACCACACAAAGAA
+sumatran            AGACTACTAACAGCGCCGGGCGATTCCTCACCCAAACCAAACCTCACGCATTCACATCAATAGTAACCGCCCTTTACAACCTAATGAGACTTGAAGGCACCTCCGACACCACACAAAGAG
+gibbon              AGACTATTGACAACGTCGGGCAACTCTCTACTCAAACCAAACCTCACGCATTCACATCAATAGAAACCGCCCCTTACAACCTAACGAGACCTGGAGGCGCCCCCGACACCACATAAAGAA
+
+7    3331
+human               AAATTCCTTCCCTTGTCCCTTTTTTCCTTTCATTAAGTTCCAAGTTAGGCGCTTTTCTTTTTCCCATTGTTCACTCCCCATCTATCTCTCTGCGCTTTCATTCAGCCCCTTCTTTTTACT
+chimpanzee          AAATTCCTCCCCTTGTCCCTTTTTTCCTTTCATTAAGTTCCAAGTTAGGCGCTTTTCTTTTTCCCATTGTTCACTCCCCATCTATCTCTCTGCGCTTTCATTCAGCCCCTTCTTTTTACT
+bonobo              AAATTCCTCCCCTTGTCCCTTTTTTCCTTTCATTAAGTTCCAAGTTAGGCGCTTTTCTTTTTCCCATTGTTCACTCCCCATCTATCTCTCTGCGCTTTCATTCAGCCCCTTCTTTTTACT
+gorilla             AAATTCCTTCCCTTGTCCCTTTTTTCCTTTCATTAAGTTCCAAGTTAGGCGCTTTTGTTTTTCCCATTGTTCACTCCCCATCTATCTCTCTGCGCTCTCATTCAGCCCCTTCTTTTTACT
+orangutan           AAATTCCTCCCCTTGTCCCTTTTTTCCTTTCATTAAGTTCCAAGTTGGGCGCTTTCCTTTTTCCCATTGTTCACTCCCCATCTATCTCTCTGCGCTCTCATTCAGCCCCTTCTTTTTACT
+sumatran            AAGTTCCTTCCCTTGTCCCTTTTTTCCTTTCATTAAGTTTTAAGTTGGGCGCTTTCCTTTTTCCCATTGTTCACTCCCCATCTATCTCTCTGCGCTCTCATTCAGCCCCTTCTTTTTACT
+gibbon              AAATTCCTCCCCTTGTCCCTCTTTTCCTTTCATTAAGTTCCAAGTTAGGCGCTTTTCTTCTTCCCATTGTTCACTCCCCATCTATCTCTCTGCGCTCTCATTCAGCCCCTTCTTTTTACT
+ 
+     7    3331
+human               CATGCTACTCCACACACCAAGCTATCTAGCCTCCCCAATCCAAAACAAACATTAAACACTTTCATCCCACGTCATAACCAATACACGCCCAAGCAGTACCCAAACATACTCCAATTCACC
+chimpanzee          CATACTACTCCACACACCAAACTACCTAGCCTCCCCAATCCAAAATAAACATCAAACACTTTCACTTTGTACCACAACCAATACACGTCCAAACAACACCCAGACATACTCCAATCCATT
+bonobo              CATGCTACTCCACACACCAAGCTACCTAGTCTCCCCAATCCAAAATAAACATCAAACATTTTCATTTCATATCACAACCAATACACGTCCAAACAACACCCAGACATACTCCAATCCATC
+gorilla             CATACTACTCCACACACCAAATCATCTAGCCTCCCCAGTCCAGAACAAACACTGAAAATTTTCACCCCACGCCACAATCGATACGCACCCGAACAATACCAAAACCTACTCTAACCTACC
+orangutan           CATACCACTCCACACCCTATACCATCCAACTTCCCCTATCCGAAACAAATACAAAACACTTCCACCCCACCCCATAATCGACACATAACCAAACGACATCCGAATCCACCCCAATTTACT
+sumatran            CATATCACTCCAAACCCCAAACCATCCAGCCTCCCCAATTCAAAACAAATACCAAGCACTCCCACCCAACCCCATAACCAACATATAATCAAACGATACCCAAATCCATCCTAATTTACC
+gibbon              CATACTACTCCATACACCAAATTATCCAACTCCCCCAATCCAGAATAAACACCGACCATCTTCACCCTCCACCACAATCAACACGCAACCAAACAACTCCTACGCACCTCTAAATCCACT
+====================================================end=========================================================
+	* 包括三个数据集（多个数据集以此类推）；
+	* 序列ID与树文件必须完全对应；
+	* 7表示有7个物种；
+	* 3331表示该数据集对应的序列长度；
+  
+#3.配置文件命名为mcmctrees.ctl，具体如下所示。
+==============================================配置文件==============================================================
+seed = -1 #设定一个随机种子，-1表示用计算机的当前时间设定种子，因此不同时间运行mcmctree，由于其随机种子不同，因此得到的结果可能有差异；要是需要得到可重复性的结果，需要将seed参数设定为一个奇数或者偶数；
+seqfile = /path/to/mtCDNApri123.txt #指定一个序列文件(给绝对路径)，具体如2所示；
+treefile = /path/to/mtCDNApri.trees #指定一个物种树文件，并标注化石矫正点（给绝对路径），具体如1所示；
+outfile = out #指定输出结果的存储文件，本分析的存储文件为out
+ndata = 3 #比对结果的分区数目，本分析有三个分区，见2的数据文件
+usedata = 1 * 0: no data; 1:seq; 2:approximation; 3:out.BV (in.BV) #0表示不计算似然值，仅计算先验值；1表示通过常规方法计算似然函数；2和3表示分别通过近似似然计算和最大似然法估算分支长度
+clock = 2 * 1: global clock; 2: independent; and 3: correlated rates #clock指定分子钟模型
+RootAge = '<1.0' * safe constraint on root age, used if no fossil for root. #为系统发育树的根部设定化石矫正点，仅适用于当系统发育树种未为树根部标注化石矫正点的情况。<1.0表示所有物种的共同祖先最早起源于100Myr
+model = 0 * 0:JC69, 1:K80, 2:F81, 3:F84, 4:HKY85 #设定替代模型
+alpha = 0 * alpha for gamma rates at sites #设定替代模型
+ncatG = 5 * No. categories in discrete gamma #设定替代模型
+cleandata = 0 * remove sites with ambiguity data (1:yes, 0:no)? #是否移除不清楚的位点，0表示不移除；1表示移除。
+BDparas = 1 1 0 * birth, death, sampling #设定birth and death process的参数，birth and death process参数用于构建没有化石证据的节点的时间先验值，默认值为1 1 0，表示不同节点的时间先验值不同。
+kappa_gamma = 6 2 * gamma prior for kappa #替代模型参数Kappa（指转换，颠换速率比值）的gamma先验值，
+alpha_gamma = 1 1 * gamma prior for alpha #替代模型参数alpha的gamma先验值（不同位点变异速率的gamma分布参数）
+rgene_gamma = 2 2 * gamma prior for rate for genes #平均替代速率的gamma先验值
+sigma2_gamma = 1 10 * gamma prior for sigma^2 (for clock=2 or 3) #速率转换参数的gamma先验值
+finetune = 1: .1 .1 .1 .1 .1 .1 * auto (0 or 1) : times, rates, etc.#4.4e版本之后，该参数不重要，设定默认即可，参数表示隐马尔科夫模型过程中的step sizes
+print = 1 #可选值为0或者1，0表示仅输出隐马尔科夫模型结果至屏幕，1表示将其输出与屏幕的同时，还将其保存于硬盘中，对应的文件名称为mcmc.out
+burnin = 2000 #丢弃前两千次取样的样本；
+sampfreq = 2 #取样次数，每两次迭代取一次样
+nsample = 20000 #总共取样的数目
+#软件总共运行的迭代次数2000+2*20000=42000
+=====================================================================================================================
+
+#4. 运行软件
+mkdir mcmctree #创建一个工作目录
+cd mcmctree #进入工作目录
+cp ../mcmctrees.ctl ./ #将配置文件拷贝到当前工作目录
+mcmctree mcmctrees.ctl #运行软件
+
+#5. 输出结果解读
+============================================输出结果=================================================================
+lnL0 = -40215.47 #初始的似然值
+Starting MCMC (np = 48) . . . #参数数目为48，7个物种的有根树有7-1=6个内部节点和7*2-2=12个分支。总共估算6个分化时间，3个平均突变速率参数以及3个速率转换参数，以及12*3=36个分支速率。总共有6+3+3+36=48个参数
+finetune steps (time rate mixing para RatePara ...): 0.1000 0.1000 0.1000 0.1000 0.1000
+paras: 6 times, 3 mu, 3 sigma2 (& rates, kappa, alpha)
+-4% 0.16 0.64 0.33 0.00 0.69 0.178 0.149 0.091 0.067 0.032 - 1.438 -34999.3 #百分比为负数表示MCMC分析处于数据过滤阶段
+Current Pjump: 0.16033 0.64117 0.32800 0.00000 0.69267
+Current finetune: 0.10000 0.10000 0.10000 0.10000 0.10000
+New finetune: 0.05050 0.31051 0.11113 0.00100 0.37446
+-2% 0.38 0.19 0.40 0.00 0.37 0.160 0.147 0.092 0.066 0.029 - 1.313 -34989.9
+Current Pjump: 0.38033 0.18628 0.39600 0.00000 0.36633
+Current finetune: 0.05050 0.31051 0.11113 0.00100 0.37446
+New finetune: 0.06743 0.18359 0.15638 0.00001 0.47671
+-1% 0.27 0.37 0.27 0.00 0.30 0.154 0.147 0.092 0.066 0.029 - 1.280 -34995.0
+Current Pjump: 0.27133 0.36956 0.27400 0.00000 0.30433
+Current finetune: 0.06743 0.18359 0.15638 0.00001 0.47671
+New finetune: 0.06009 0.23632 0.14090 0.00000 0.48476
+0% 0.29 0.27 0.32 0.00 0.30 0.155 0.145 0.094 0.067 0.029 - 1.332 -34996.7 0:02
+Current Pjump: 0.29367 0.26978 0.32200 0.00000 0.29833
+Current finetune: 0.06009 0.23632 0.14090 0.00000 0.48476
+New finetune: 0.05862 0.20922 0.15316 0.00000 0.48163
+5% 0.32 0.31 0.25 0.00 0.31 0.158 0.147 0.092 0.066 0.029 - 1.280 -34997.5 0:04
+10% 0.31 0.32 0.27 0.00 0.30 0.158 0.146 0.093 0.067 0.029 - 1.303 -35000.8 0:06
+15% 0.32 0.32 0.28 0.00 0.30 0.157 0.146 0.093 0.067 0.029 - 1.308 -34994.6 0:08
+20% 0.32 0.32 0.28 0.00 0.31 0.157 0.146 0.093 0.067 0.029 - 1.311 -34993.5 0:10
+===========================================end====================================================================================
+
+#6. 结果查看（Figtree软件）
+具体见本目录的文件fig1.png
+
